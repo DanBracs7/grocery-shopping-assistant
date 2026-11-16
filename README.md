@@ -1,20 +1,27 @@
-# Kitchen Assistant — A-Frame tutorial
+# A-Frame Example App for HCI Intro
 
-A small kitchen counter seen "through smart glasses". The assistant never appears as a character, only as **hint cards**. Two stages, one scene:
+This small A-Frame app has two scenes: one demonstrates the fundamentals of 3D positioning, and the other introduces basic interactions.
+It uses JavaScript, [A-Frame](https://aframe.io) 1.8, and [Vite](https://vite.dev).
 
-1. **Positioning** — _where does the assistant's information live?_ (world-locked, object-anchored, head-locked)
-2. **Interaction** — _how do I summon, act on and dismiss it?_ (hover, click, confirm, step through)
-
-Plain JavaScript, [A-Frame](https://aframe.io) 1.8 and [Vite](https://vite.dev). No framework.
+Vite provides a development server with HTTPS for WebXR.
 
 ## Run it
+
+Clone the repository:
+
+```bash
+git clone https://github.com/HCI-TUB/hci-intro-a-frame.git
+cd hci-intro-a-frame
+```
+
+Alternatively, clone it with your preferred Git GUI. From a terminal in the repository folder, run:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the printed `https://localhost:5173` (accept the certificate warning). Start at the landing page, or go directly to `/stage-1/` or `/stage-2/`.
+Open the printed `https://localhost:5173` URL and accept the certificate warning. The landing page links to both scenes.
 
 **Desktop controls:** WASD to walk, drag the mouse to look, click to interact (Stage 2).
 
@@ -33,13 +40,13 @@ Open the printed `https://localhost:5173` (accept the certificate warning). Star
 
 In the headset use the **VR** or **AR** (passthrough, Quest 3) button at the bottom right. Controllers: trigger = click, **left thumbstick = walk**. The AR button only appears on devices that support passthrough AR (Quest 3/3S; in the Immersive Web Emulator choose a Quest 3 device profile).
 
-## Inspector tip
+## A-Frame inspector
 
-Press `Ctrl+Alt+I` to open the A-Frame Inspector, drag things around and read off coordinates. **Inspector changes are not saved** — copy the values into `index.html`. Vite reloads on save.
+Press `Ctrl+Alt+I` to open the A-Frame Inspector, drag things around and read off coordinates. **Inspector changes are not saved** — copy the values into your HTML. Vite reloads on save.
 
-## Your tasks
+## Working with this
 
-Make one small change per stage from the cards in [docs/EXERCISES.md](docs/EXERCISES.md). Treat the cards as suggested starting points; pick whichever interest you and go beyond them.
+[The exercise ideas](docs/EXERCISES.md) offer starting points for modifying this sample.
 
 ## Project structure
 
