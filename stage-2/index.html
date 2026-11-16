@@ -19,7 +19,9 @@
       That keeps hidden or decorative things from stealing clicks. They all emit the same events:
       mouseenter, mouseleave, click.
     -->
+    <!-- xr-buttons: shows both the VR and the AR (passthrough) button where supported. -->
     <a-scene
+      xr-buttons
       background="color: #cfd8e3"
       input-mode
       cursor="rayOrigin: mouse"
@@ -30,7 +32,7 @@
 
       <!-- CAMERA RIG (eye height 1.6 m on desktop; in VR the real head pose takes over).
            The two hands are Quest controllers: trigger = click. input-mode removes them for ?input=gaze. -->
-      <a-entity id="rig" position="0 0 0" wasd-controls>
+      <a-entity id="rig" position="0 0 0" wasd-controls thumbstick-move="hand: #left-hand">
         <a-entity id="head" camera position="0 1.6 0" look-controls></a-entity>
         <a-entity
           id="left-hand"

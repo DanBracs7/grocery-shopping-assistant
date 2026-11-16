@@ -31,7 +31,7 @@ Open the printed `https://localhost:5173` (accept the certificate warning). Star
 2. **USB:** enable developer mode on the Quest, install `adb`, plug in, run `npm run quest:usb`, then open `https://localhost:5173` on the Quest.
 3. **Static deploy:** `npm run build` creates `dist/`, which works on any static host. `.github/workflows/pages.yml` publishes it to GitHub Pages: enable _Settings → Pages → Source: GitHub Actions_, push to `main`, open the URL it prints. HTTPS comes for free.
 
-In the headset use the **VR** or **AR** (passthrough, Quest 3) button at the bottom right. Controllers: trigger = click.
+In the headset use the **VR** or **AR** (passthrough, Quest 3) button at the bottom right. Controllers: trigger = click, **left thumbstick = walk**. The AR button only appears on devices that support passthrough AR (Quest 3/3S; in the Immersive Web Emulator choose a Quest 3 device profile).
 
 ## Inspector tip
 

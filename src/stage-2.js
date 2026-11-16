@@ -11,3 +11,5 @@ import './components/position-label.js';
 import './components/event-log.js';
 import './components/gaze-cursor.js';
 import './components/input-mode.js';
+import './components/thumbstick-move.js';
+import './components/xr-buttons.js';

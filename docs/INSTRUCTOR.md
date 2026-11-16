@@ -39,6 +39,9 @@ Timing: Stage 1 = 4 min walkthrough + 8 min hands-on. Stage 2 = 5 min + 10 min. 
 - `hint-card.js` is ~95 lines, slightly over the ~80 target because it builds the whole card.
 - `aframe-kitchen-assistant-prompt.md` (the original brief) stays in the repo root.
 
+- **Stick walking:** `thumbstick-move` reads the left controller's `thumbstickmoved`. In `?input=gaze` mode the controllers are removed, so there is no stick walking there (WASD still works on desktop).
+- **AR button:** A-Frame only shows the VR button by default; `xr-buttons` switches `xr-mode-ui` to show AR too (untested on a real headset).
+
 ## Solutions branch
 
 Branch `solutions` has one commit per card (`P1: …` … `I7: …`). The commits are **cumulative** (each on top of the previous), applied in card order. Compare with `git diff main solutions -- stage-1 stage-2`, or `git show <commit>` for a single card. Every 🟢/🟡 card only edits the stage HTML; P3's, I3's and I5's solutions needed no JS either (I3/I5 use a small inline listener script, see the commits).

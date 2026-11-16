@@ -103,3 +103,22 @@ test('stage 2: gaze mode swaps the input device', async ({ page }) => {
   expect(problems).toEqual([]);
   await shot(page, 'stage-2-gaze');
 });
+
+test('left thumbstick walks the rig; VR and AR buttons are enabled', async ({ page }) => {
+  await open(page, '/stage-2/');
+  expect(
+    await page.evaluate(() => document.querySelector('a-scene').getAttribute('xr-mode-ui').XRMode),
+  ).toBe('xr');
+  await expect(page.locator('.a-enter-ar-button')).toHaveCount(1); // hidden where AR is unsupported
+  const z = () => page.evaluate(() => document.querySelector('#rig').object3D.position.z);
+  expect(await z()).toBe(0);
+  // Push the stick forward for a moment: the user looks towards -Z, so z must decrease.
+  await page.evaluate(() =>
+    document.querySelector('#left-hand').emit('thumbstickmoved', { x: 0, y: -1 }),
+  );
+  await page.waitForTimeout(500);
+  await page.evaluate(() =>
+    document.querySelector('#left-hand').emit('thumbstickmoved', { x: 0, y: 0 }),
+  );
+  expect(await z()).toBeLessThan(-0.2);
+});

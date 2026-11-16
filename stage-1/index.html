@@ -14,7 +14,8 @@
       Position is "x y z", rotation is in degrees, scale 1 = normal size.
       Everything you need for the exercises is in THIS file. Reload happens on save.
     -->
-    <a-scene background="color: #cfd8e3">
+    <!-- xr-buttons: shows both the VR and the AR (passthrough) button where supported. -->
+    <a-scene xr-buttons background="color: #cfd8e3">
       <!-- Lights -->
       <a-entity light="type: ambient; intensity: 1.0; color: #fff"></a-entity>
       <a-entity light="type: directional; intensity: 0.7" position="1 3 2"></a-entity>
@@ -22,7 +23,7 @@
       <!-- CAMERA RIG. The rig stands on the floor (y = 0). The camera sits 1.6 m up = eye height
            on desktop. In VR the headset's real head pose takes over, so this height is ignored.
            WASD moves the rig, dragging the mouse turns the camera. -->
-      <a-entity id="rig" position="0 0 0" wasd-controls>
+      <a-entity id="rig" position="0 0 0" wasd-controls thumbstick-move="hand: #left-hand">
         <a-entity id="head" camera position="0 1.6 0" look-controls>
           <!-- HEAD-LOCKED: a child of the camera. Its position is relative to your head, so it
                follows every head movement. z = -0.8 means 0.8 m in front of the face. -->
@@ -32,6 +33,9 @@
             position="0 -0.15 -0.8"
             position-label="offsetY: -0.12; offsetZ: 0; width: 0.4"
           ></a-entity>
+          <!-- Quest controllers (shown in VR). Left stick = walk. -->
+          <a-entity id="left-hand" meta-touch-controls="hand: left"></a-entity>
+          <a-entity id="right-hand" meta-touch-controls="hand: right"></a-entity>
         </a-entity>
       </a-entity>
 
