@@ -20,10 +20,10 @@ Open the printed `https://localhost:5173` (accept the certificate warning). Star
 
 ## URL parameters
 
-| Parameter       | Effect                                                                                  |
-| --------------- | --------------------------------------------------------------------------------------- |
-| `?debug=1`/`0`  | Debug helpers on/off (grid, axes, position labels in Stage 1; event log in Stage 2)     |
-| `?input=gaze`   | Stage 2: head-gaze ring with 1.2 s dwell selection instead of mouse / controllers       |
+| Parameter      | Effect                                                                              |
+| -------------- | ----------------------------------------------------------------------------------- |
+| `?debug=1`/`0` | Debug helpers on/off (grid, axes, position labels in Stage 1; event log in Stage 2) |
+| `?input=gaze`  | Stage 2: head-gaze ring with 1.2 s dwell selection instead of mouse / controllers   |
 
 ## Try it on a Meta Quest (3 ways)
 
