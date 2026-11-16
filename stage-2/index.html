@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Stage 2 · Interaction</title>
+    <script type="module" src="/src/stage-2.js"></script>
+  </head>
+  <!-- data-debug="off": the event log is hidden. Add ?debug=1 to the URL to see it. -->
+  <body data-debug="off">
+    <!--
+      UNITS: 1 unit = 1 metre. Y points UP. The user starts at 0 0 0 and looks towards -Z.
+      Position is "x y z", rotation is in degrees, scale 1 = normal size.
+      Everything you need for the exercises is in THIS file. Reload happens on save.
+
+      INPUT: one interaction model for every device. The raycasters below (mouse cursor on the scene,
+      lasers on the hands, gaze ring with ?input=gaze) ONLY hit entities with class="interactive".
+      That keeps hidden or decorative things from stealing clicks. They all emit the same events:
+      mouseenter, mouseleave, click.
+    -->
+    <a-scene
+      background="color: #cfd8e3"
+      input-mode
+      cursor="rayOrigin: mouse"
+      raycaster="objects: .interactive"
+    >
+      <a-entity light="type: ambient; intensity: 1.0; color: #fff"></a-entity>
+      <a-entity light="type: directional; intensity: 0.7" position="1 3 2"></a-entity>
+
+      <!-- CAMERA RIG (eye height 1.6 m on desktop; in VR the real head pose takes over).
+           The two hands are Quest controllers: trigger = click. input-mode removes them for ?input=gaze. -->
+      <a-entity id="rig" position="0 0 0" wasd-controls>
+        <a-entity id="head" camera position="0 1.6 0" look-controls></a-entity>
+        <a-entity
+          id="left-hand"
+          laser-controls="hand: left"
+          raycaster="objects: .interactive"
+        ></a-entity>
+        <a-entity
+          id="right-hand"
+          laser-controls="hand: right"
+          raycaster="objects: .interactive"
+        ></a-entity>
+      </a-entity>
+
+      <a-plane
+        id="floor"
+        hide-on-enter-ar
+        rotation="-90 0 0"
+        width="6"
+        height="6"
+        color="#8f9aa8"
+      ></a-plane>
+      <a-plane
+        id="wall"
+        hide-on-enter-ar
+        position="0 1.5 -1.6"
+        width="6"
+        height="3"
+        color="#e8e1d5"
+      ></a-plane>
+      <a-box
+        id="counter"
+        position="0 0.45 -1.2"
+        width="2"
+        height="0.9"
+        depth="0.6"
+        color="#b58b5a"
+      ></a-box>
+
+      <!-- Debug overlay (?debug=1): the last events, so you can see that they fire. -->
+      <a-entity id="event-log" event-log position="-1 2.3 -1.59"></a-entity>
+
+      <!-- KETTLE: pattern "assistant proposes, user confirms".
+           class="interactive" is on an invisible hit box: the ray needs a mesh to hit.
+           hover-highlight = hover feedback, toggle-hint = click shows/hides the hint,
+           kettle-assistant = the Start -> Boiling -> Ready logic. -->
+      <a-entity
+        id="kettle"
+        position="-0.6 0.9 -1.2"
+        hover-highlight
+        toggle-hint="target: #kettle-hint"
+        kettle-assistant="hint: #kettle-hint; delay: 8000"
+      >
+        <!-- invisible hit box: the thing the ray can hit -->
+        <a-box
+          class="interactive"
+          width="0.3"
+          height="0.32"
+          depth="0.24"
+          position="0 0.16 0"
+          material="opacity: 0; transparent: true; depthWrite: false"
+        ></a-box>
+        <a-cylinder radius="0.09" height="0.2" position="0 0.1 0" color="#c9ced6"></a-cylinder>
+        <a-cone
+          radius-bottom="0.085"
+          radius-top="0.025"
+          height="0.07"
+          position="0 0.235 0"
+          color="#9aa3b0"
+        ></a-cone>
+        <a-torus
+          radius="0.05"
+          radius-tubular="0.009"
+          position="0.11 0.12 0"
+          color="#3a3f48"
+        ></a-torus>
+        <a-cylinder
+          radius="0.015"
+          height="0.09"
+          position="-0.11 0.17 0"
+          rotation="0 0 40"
+          color="#c9ced6"
+        ></a-cylinder>
+
+        <!-- The hint is a child of the kettle: its position is LOCAL (0.55 m above the kettle).
+             visible="false": hidden until clicked. Buttons are big enough for a controller ray. -->
+        <a-entity
+          id="kettle-hint"
+          visible="false"
+          face-camera
+          position="0 0.55 0"
+          hint-card="title: Kettle; text: Boil water for tea?; accent: #ffb347; width: 0.5; height: 0.26"
+        >
+          <a-entity
+            id="kettle-close"
+            hint-button="label: X; event: hint-close; width: 0.07; height: 0.07"
+            position="0.2 0.08 0.01"
+          ></a-entity>
+          <a-entity
+            id="kettle-start"
+            hint-button="label: Start; event: kettle-start; width: 0.22"
+            position="0.1 -0.08 0.01"
+          ></a-entity>
+        </a-entity>
+      </a-entity>
+
+      <!-- MUG: deliberately NOT interactive. Making it interactive is a change card. -->
+      <a-entity id="mug" position="-0.2 0.9 -1.2">
+        <a-cylinder radius="0.04" height="0.09" position="0 0.045 0" color="#d9694f"></a-cylinder>
+        <a-torus
+          radius="0.025"
+          radius-tubular="0.008"
+          position="0.046 0.05 0"
+          color="#d9694f"
+        ></a-torus>
+      </a-entity>
+
+      <!-- RECIPE CARD: pattern "step through content". -->
+      <a-entity
+        id="recipe"
+        position="0.25 0.9 -1.2"
+        hover-highlight
+        toggle-hint="target: #recipe-hint"
+        recipe-steps="hint: #recipe-hint; steps: Boil 300 ml of water, Put a tea bag in the mug, Pour on the water and wait 3 min, Remove the bag and enjoy"
+      >
+        <!-- invisible hit box: the thing the ray can hit -->
+        <a-box
+          class="interactive"
+          width="0.26"
+          height="0.22"
+          depth="0.1"
+          position="0 0.1 0"
+          material="opacity: 0; transparent: true; depthWrite: false"
+        ></a-box>
+        <a-box
+          width="0.04"
+          height="0.05"
+          depth="0.04"
+          position="0 0.025 -0.02"
+          color="#6b5a45"
+        ></a-box>
+        <a-box
+          width="0.22"
+          height="0.15"
+          depth="0.01"
+          position="0 0.085 0"
+          rotation="-15 0 0"
+          color="#f6f1e4"
+        >
+          <a-box
+            width="0.16"
+            height="0.01"
+            depth="0.002"
+            position="0 0.04 0.006"
+            color="#b9b19e"
+          ></a-box>
+          <a-box
+            width="0.16"
+            height="0.01"
+            depth="0.002"
+            position="0 0.01 0.006"
+            color="#b9b19e"
+          ></a-box>
+          <a-box
+            width="0.1"
+            height="0.01"
+            depth="0.002"
+            position="-0.03 -0.02 0.006"
+            color="#b9b19e"
+          ></a-box>
+        </a-box>
+        <a-entity
+          id="recipe-hint"
+          visible="false"
+          face-camera
+          position="0 0.4 0"
+          hint-card="title: Step 1; text: ...; accent: #4da3ff; width: 0.5; height: 0.26"
+        >
+          <a-entity
+            id="recipe-close"
+            hint-button="label: X; event: hint-close; width: 0.07; height: 0.07"
+            position="0.2 0.08 0.01"
+          ></a-entity>
+          <a-entity
+            id="recipe-next"
+            hint-button="label: Next; event: recipe-next; width: 0.22"
+            position="0.1 -0.08 0.01"
+          ></a-entity>
+        </a-entity>
+      </a-entity>
+
+      <!-- PLANT: pattern "show / dismiss" - the simplest one. Copy this for your own objects. -->
+      <a-entity
+        id="plant"
+        position="0.7 0.9 -1.2"
+        hover-highlight
+        toggle-hint="target: #plant-hint"
+      >
+        <!-- invisible hit box: the thing the ray can hit -->
+        <a-box
+          class="interactive"
+          width="0.18"
+          height="0.4"
+          depth="0.18"
+          position="0 0.2 0"
+          material="opacity: 0; transparent: true; depthWrite: false"
+        ></a-box>
+        <a-cylinder radius="0.06" height="0.1" position="0 0.05" color="#b4673f"></a-cylinder>
+        <a-cone
+          radius-bottom="0.03"
+          radius-top="0"
+          height="0.22"
+          position="0 0.21 0"
+          color="#4f9d63"
+        ></a-cone>
+        <a-cone
+          radius-bottom="0.025"
+          radius-top="0"
+          height="0.18"
+          position="0.05 0.19 0"
+          rotation="0 0 -30"
+          color="#5fb374"
+        ></a-cone>
+        <a-cone
+          radius-bottom="0.025"
+          radius-top="0"
+          height="0.18"
+          position="-0.05 0.19 0"
+          rotation="0 0 30"
+          color="#5fb374"
+        ></a-cone>
+        <a-sphere radius="0.045" position="0 0.3 0" color="#6cc283"></a-sphere>
+
+        <a-entity
+          id="plant-hint"
+          visible="false"
+          face-camera
+          position="0 0.55 0"
+          hint-card="title: Plant; text: Water me in 2 days; accent: #5fd38d; width: 0.5; height: 0.26"
+        >
+          <a-entity
+            id="plant-close"
+            hint-button="label: X; event: hint-close; width: 0.07; height: 0.07"
+            position="0.2 0.08 0.01"
+          ></a-entity>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
