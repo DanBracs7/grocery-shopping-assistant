@@ -1,7 +1,7 @@
 # Change cards
 
 🟢 HTML only, ~2–4 min · 🟡 HTML, needs thinking, ~5 min · 🔴 stretch, may touch JS.
-Commit after each card: `git commit -am "P3: anchor timer to kettle"`. Remember: Inspector changes are not saved, copy values into the HTML.
+The cards are suggested starting points for changes; do them in any order, or invent your own. Remember: Inspector changes are not saved, copy values into the HTML.
 
 ## Stage 1 — Positioning (`stage-1/index.html`)
 

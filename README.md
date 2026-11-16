@@ -39,7 +39,7 @@ Press `Ctrl+Alt+I` to open the A-Frame Inspector, drag things around and read of
 
 ## Your tasks
 
-Make one small change per stage from the cards in [docs/EXERCISES.md](docs/EXERCISES.md). Commit after each card, e.g. `git commit -am "P3: anchor timer to kettle"`.
+Make one small change per stage from the cards in [docs/EXERCISES.md](docs/EXERCISES.md). Treat the cards as suggested starting points; pick whichever interest you and go beyond them.
 
 ## Project structure
 
