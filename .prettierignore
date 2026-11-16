@@ -1,0 +1,6 @@
+dist
+node_modules
+public/fonts
+package-lock.json
+test-results
+aframe-kitchen-assistant-prompt.md

@@ -1,0 +1,27 @@
+{
+  "name": "kitchen-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A-Frame teaching example for an intro HCI course: smart-glasses hint cards in a kitchen.",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "quest:usb": "adb reverse tcp:5173 tcp:5173 && echo 'Now open https://localhost:5173 in the Quest Browser'",
+    "format": "prettier --write .",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "aframe": "^1.8.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "prettier": "^3.0.0",
+    "vite": "^8.3.8"
+  }
+}
