@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Kitchen Assistant · HCI A-Frame tutorial</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #14181f;
+        color: #e8ecf3;
+        font-family: system-ui, sans-serif;
+      }
+      main {
+        max-width: 640px;
+        padding: 24px;
+        text-align: center;
+      }
+      h1 {
+        margin-bottom: 4px;
+      }
+      p {
+        color: #aab3c2;
+        line-height: 1.5;
+      }
+      a.stage {
+        display: block;
+        margin: 20px 0;
+        padding: 28px 24px;
+        border-radius: 16px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 1.6rem;
+        font-weight: 600;
+      }
+      a.stage small {
+        display: block;
+        margin-top: 6px;
+        font-size: 1rem;
+        font-weight: 400;
+        opacity: 0.85;
+      }
+      a.stage:hover,
+      a.stage:focus {
+        filter: brightness(1.2);
+      }
+      #s1 {
+        background: #2f6fb5;
+      }
+      #s2 {
+        background: #2f8f5b;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Kitchen Assistant</h1>
+      <p>A smart-glasses assistant shows up as small hint cards. Two stages, one kitchen.</p>
+      <a class="stage" id="s1" href="stage-1/">
+        Stage 1 · Positioning
+        <small>Where does the assistant's information live?</small>
+      </a>
+      <a class="stage" id="s2" href="stage-2/">
+        Stage 2 · Interaction
+        <small>How do I summon, act on and dismiss it?</small>
+      </a>
+      <p>
+        Tip: add
+        <code>?debug=1</code>
+        or
+        <code>?input=gaze</code>
+        to a stage URL.
+      </p>
+    </main>
+  </body>
+</html>
