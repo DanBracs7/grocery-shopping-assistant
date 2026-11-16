@@ -20,5 +20,5 @@ export function isDebug() {
 /** URL of the bundled MSDF font (works in dev, in dist/ and under a sub-path). */
 export const FONT_URL = new URL('../fonts/Roboto-msdf.json', window.location.href).href;
 
-/** Settings every text entity needs: our local font, and `negate: false` for this font's atlas. */
-export const TEXT_BASE = { font: FONT_URL, negate: false };
+/** Settings every text entity needs: our local font (instead of A-Frame's CDN default). */
+export const TEXT_BASE = { font: FONT_URL };

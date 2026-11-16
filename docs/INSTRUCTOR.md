@@ -26,12 +26,11 @@ Timing: Stage 1 = 4 min walkthrough + 8 min hands-on. Stage 2 = 5 min + 10 min. 
 - **Inspector changes vanish on reload:** by design; copy values into the HTML.
 - **Old page on Quest:** Quest Browser caches aggressively; reload with a changed query (`?v=2`).
 - **Port 5173 in use:** Vite picks the next port; use the URL it prints (the USB script assumes 5173, stop the other process).
-- **Text looks fuzzy/boxy:** MSDF text is blurry at small sizes in low-res or software-rendered screenshots; make cards larger rather than smaller.
+- **Text has boxes around each letter:** only seen in software-rendered (SwiftShader) headless screenshots; real GPUs render it cleanly. Don't trust `test-results/*.png` for text quality.
 
 ## Deviations from the spec
 
 - **Font glyphs:** the bundled Roboto MSDF font has no `×`, `·` or `✓`. The close button is a plain `X`, the kettle's ready text is "Water is ready!".
-- **Text `negate: false`:** needed for the CDN-supplied font atlas with this A-Frame version; centralised in `TEXT_BASE` (`src/utils/url-params.js`).
 - **Hit boxes:** a raycaster only hits entities that own a mesh, so interactive objects contain an invisible `a-box.interactive`. Events bubble from it to the object.
 - **Raycaster refresh:** A-Frame 1.8's `autoRefresh` already observes class changes; `hint-card` still calls `refreshObjects()` for determinism.
 - **Hands:** `laser-controls` in 1.8 has no hand-tracking support, and adding pinch-pointing needs more than ~40 lines, so hands are left out (controllers suffice).
