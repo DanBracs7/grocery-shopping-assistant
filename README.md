@@ -32,7 +32,7 @@ Open the printed `https://localhost:5173` URL and accept the certificate warning
 | `?debug=1`/`0` | Debug helpers on/off (grid, axes, position labels in Stage 1; event log in Stage 2) |
 | `?input=gaze`  | Stage 2: head-gaze ring with 1.2 s dwell selection instead of mouse / controllers   |
 
-## Try it on a Meta Quest (3 ways)
+## Try it on a Meta Quest
 
 1. **Same Wi-Fi:** `npm run dev`, open the printed `https://<laptop-ip>:5173` in Quest Browser, then _Advanced → Proceed_. (University Wi-Fi often blocks this.)
 2. **USB:** enable developer mode on the Quest, install `adb`, plug in, run `npm run quest:usb`, then open `https://localhost:5173` on the Quest.
