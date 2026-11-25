@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Grocery Shopping Assistant</title>
+    <script type="module" src="/src/grocery.js"></script>
+  </head>
+  <body data-debug="off">
+    <!--
+      OUR CORE INTERACTION (storyboard steps 2-6), mocked:
+        2. the agent "analyses" the milks on the shelf (a few seconds)
+        3. it highlights the 2 best matches with a tag under each (translated name, price, protein)
+        4. the user picks one ("Brand 1" / "Brand 2", or points at / looks at the carton)
+           or says "Neither" -> the next 2 options
+        4a. after choosing: "Save it" as default for next time, or "Not now"
+        6. the chosen carton stays highlighted, the shopping list is updated
+      Voice is simulated with buttons. Works with mouse, Quest controllers (trigger),
+      hand pinch and gaze dwell (add ?input=gaze to the URL).
+
+      UNITS: 1 unit = 1 metre, Y up, the user starts at 0 0 0 looking towards -Z.
+      Product data (names, prices, protein) is written on each carton below: change it freely.
+      The bundled font only supports plain ASCII: write EUR, no umlauts.
+    -->
+    <a-scene
+      xr-buttons
+      background="color: #cfd8e3"
+      input-mode
+      cursor="rayOrigin: mouse"
+      raycaster="objects: .interactive"
+    >
+      <a-entity light="type: ambient; intensity: 1.0; color: #fff"></a-entity>
+      <a-entity light="type: directional; intensity: 0.7" position="1 3 2"></a-entity>
+
+      <!-- CAMERA RIG, same as in the course example (trigger = click, left thumbstick = walk). -->
+      <a-entity id="rig" position="0 0 0" wasd-controls thumbstick-move="hand: #left-hand">
+        <a-entity id="head" camera position="0 1.6 0" look-controls></a-entity>
+        <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .interactive"></a-entity>
+        <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .interactive"></a-entity>
+      </a-entity>
+
+      <!-- ROOM: hidden in passthrough AR (hide-on-enter-ar), the shelf stays. -->
+      <a-plane id="floor" hide-on-enter-ar rotation="-90 0 0" width="6" height="6" color="#8f9aa8"></a-plane>
+      <a-plane id="wall" hide-on-enter-ar position="0 1.5 -1.6" width="6" height="3" color="#e8e1d5"></a-plane>
+
+      <!-- SHELF: 1.3 m in front of the user. Boards at 0.4 / 0.9 / 1.4 m. The milks are on the middle board. -->
+      <a-entity id="shelf" position="0 0 -1.3">
+        <a-box position="0 0.75 -0.16" width="1.8" height="1.5" depth="0.02" color="#d9dde3"></a-box>
+        <a-box position="-0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0 0.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 0.9 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 1.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+
+        <!-- MILKS (middle board). Labels are in German like in a real Berlin supermarket;
+             the assistant shows the English name ("en") on its tag. -->
+        <a-entity id="milk-4" position="-0.65 0.91 0.02" hover-highlight
+          milk-carton="label: Laktosefrei; en: Lactose-free milk; price: 1.39; protein: 3.4; color: #b48ad6"></a-entity>
+        <a-entity id="milk-1" position="-0.39 0.91 0.02" hover-highlight
+          milk-carton="label: H-Milch; en: Long-life milk; price: 1.09; protein: 3.4; color: #4da3ff"></a-entity>
+        <a-entity id="milk-6" position="-0.13 0.91 0.02" hover-highlight
+          milk-carton="label: Weidemilch; en: Pasture milk; price: 1.59; protein: 3.4; color: #4fb0b5"></a-entity>
+        <a-entity id="milk-5" position="0.13 0.91 0.02" hover-highlight
+          milk-carton="label: Frische Milch; en: Fresh milk; price: 1.19; protein: 3.3; color: #f2b84b"></a-entity>
+        <a-entity id="milk-2" position="0.39 0.91 0.02" hover-highlight
+          milk-carton="label: Eiweiss Milch; en: Protein milk; price: 1.79; protein: 5.0; color: #e0574f"></a-entity>
+        <a-entity id="milk-3" position="0.65 0.91 0.02" hover-highlight
+          milk-carton="label: Bio Vollmilch; en: Organic whole milk; price: 1.49; protein: 3.3; color: #5fb374"></a-entity>
+
+        <!-- Filler products (not interactive), so it looks like a shelf. -->
+        <a-cylinder position="-0.6 0.45 0" radius="0.05" height="0.09" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="-0.45 0.45 0" radius="0.05" height="0.09" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="0.3 0.45 0" radius="0.05" height="0.09" color="#ffe1a8"></a-cylinder>
+        <a-cylinder position="0.45 0.45 0" radius="0.05" height="0.09" color="#ffe1a8"></a-cylinder>
+        <a-box position="-0.72 1.54 0" width="0.18" height="0.26" depth="0.06" color="#d9694f"></a-box>
+        <a-box position="0.72 1.54 0" width="0.18" height="0.26" depth="0.06" color="#6b8f3f"></a-box>
+      </a-entity>
+
+      <!-- THE ASSISTANT: its panel floats just above the shelf, slightly above eye level,
+           so it does not cover the products (journey stage 5: "the display may block his view").
+           The buttons stand in for the voice commands. Their labels/events are set by milk-assistant. -->
+      <a-entity
+        id="assistant"
+        position="0 1.74 -1.25"
+        milk-assistant="panel: #milk-panel; list: #shopping-list; delay: 2500; compared: 6;
+                        rounds: milk-1 milk-2, milk-5 milk-3;
+                        tags: Best price/More protein, Cheaper/Organic;
+                        items: Milk, Eggs, Apples, Bread, Sugar, Cheese, Carrots, Yogurts"
+      >
+        <a-entity
+          id="milk-panel"
+          face-camera="yOnly: true"
+          hint-card="title: Milk; text: ...; accent: #2f8cff; width: 0.66; height: 0.36"
+        >
+          <a-entity id="btn-1" hint-button="label: Brand 1; event: pick-0; width: 0.19" position="-0.21 -0.12 0.01"></a-entity>
+          <a-entity id="btn-2" hint-button="label: Brand 2; event: pick-1; width: 0.19" position="0 -0.12 0.01"></a-entity>
+          <a-entity id="btn-3" hint-button="label: Neither; event: neither; width: 0.19" position="0.21 -0.12 0.01"></a-entity>
+        </a-entity>
+      </a-entity>
+
+      <!-- SHOPPING LIST: world-locked at the side of the shelf (step 1 of the storyboard).
+           Try other anchors: make it a child of #head (head-locked) or use lazy-follow (body-locked). -->
+      <a-entity
+        id="shopping-list"
+        position="-1.15 1.35 -1.05"
+        face-camera="yOnly: true"
+        hint-card="title: Shopping list; text: ...; accent: #5fd38d; width: 0.42; height: 0.38"
+      ></a-entity>
+    </a-scene>
+  </body>
+</html>
