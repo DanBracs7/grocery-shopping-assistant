@@ -70,13 +70,14 @@ AFRAME.registerComponent('milk-assistant', {
       return;
     }
     this.round = round;
+    const left = this.data.compared - round * 2; // milks not rejected yet, these 2 included
     const ids = this.data.rounds[round].trim().split(/\s+/);
     const tags = (this.data.tags[round] || 'Option 1/Option 2').split('/');
     this.candidates = ids.map((id) => this.el.sceneEl.querySelector(`#${id}`));
     this.candidates.forEach((c, i) => c.components['milk-carton'].recommend(`${i + 1} - ${tags[i]}`));
     this.setState(
       'options',
-      round === 0 ? 'Milk: 2 best matches' : 'Milk: next 2 options',
+      round === 0 ? 'Milk: 2 best matches' : `Milk: ${left} options left`,
       `Compared ${this.data.compared} milks: price + protein.\nSay "Brand 1", "Brand 2" or "Neither".`,
       [
         ['Brand 1', 'pick-0'],
