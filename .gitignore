@@ -12,11 +12,21 @@ dist
 dist-ssr
 *.local
 
+# Secrets (API keys etc.) — never commit these, the repo is public
+.env
+.env.*
+
+# Screen recordings for the deliverable (too big for git)
+recordings/
+*.mp4
+*.mov
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
