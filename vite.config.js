@@ -15,6 +15,7 @@ export default defineConfig({
         main: resolve(import.meta.dirname, 'index.html'),
         stage1: resolve(import.meta.dirname, 'stage-1/index.html'),
         stage2: resolve(import.meta.dirname, 'stage-2/index.html'),
+        grocery: resolve(import.meta.dirname, 'grocery/index.html'),
       },
     },
   },
