@@ -11,4 +11,5 @@ import './components/input-mode.js';
 import './components/thumbstick-move.js';
 import './components/xr-buttons.js';
 import './components/milk-carton.js';
+import './components/shopping-cart.js';
 import './components/milk-assistant.js';

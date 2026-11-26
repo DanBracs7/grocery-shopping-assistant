@@ -4,84 +4,187 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:," />
-    <title>Kitchen Assistant · HCI A-Frame tutorial</title>
-    <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: #14181f;
-        color: #e8ecf3;
-        font-family: system-ui, sans-serif;
-      }
-      main {
-        max-width: 640px;
-        padding: 24px;
-        text-align: center;
-      }
-      h1 {
-        margin-bottom: 4px;
-      }
-      p {
-        color: #aab3c2;
-        line-height: 1.5;
-      }
-      a.stage {
-        display: block;
-        margin: 20px 0;
-        padding: 28px 24px;
-        border-radius: 16px;
-        color: #fff;
-        text-decoration: none;
-        font-size: 1.6rem;
-        font-weight: 600;
-      }
-      a.stage small {
-        display: block;
-        margin-top: 6px;
-        font-size: 1rem;
-        font-weight: 400;
-        opacity: 0.85;
-      }
-      a.stage:hover,
-      a.stage:focus {
-        filter: brightness(1.2);
-      }
-      #s1 {
-        background: #2f6fb5;
-      }
-      #s2 {
-        background: #2f8f5b;
-      }
-      #s3 {
-        background: #b5652f;
-      }
-    </style>
+    <title>Grocery Shopping Assistant</title>
+    <script type="module" src="/src/grocery.js"></script>
   </head>
-  <body>
-    <main>
-      <h1>Kitchen Assistant</h1>
-      <p>A smart-glasses assistant shows up as small hint cards. Two stages, one kitchen.</p>
-      <a class="stage" id="s3" href="grocery/">
-        Grocery Shopping Assistant
-        <small>Our prototype: compare the milks on the shelf and pick one</small>
-      </a>
-      <a class="stage" id="s1" href="stage-1/">
-        Stage 1 · Positioning
-        <small>Where does the assistant's information live?</small>
-      </a>
-      <a class="stage" id="s2" href="stage-2/">
-        Stage 2 · Interaction
-        <small>How do I summon, act on and dismiss it?</small>
-      </a>
-      <p>
-        Tip: add
-        <code>?debug=1</code>
-        or
-        <code>?input=gaze</code>
-        to a stage URL.
-      </p>
-    </main>
+  <body data-debug="off">
+    <!--
+      OUR CORE INTERACTION (storyboard steps 2-6), mocked:
+        2. the agent "analyses" the milks on the shelf (a few seconds)
+        3. it highlights the 2 best matches with a tag under each (translated name, price, protein)
+        4. the user picks one ("Brand 1" / "Brand 2", or points at / looks at the carton)
+           or says "Neither" -> the next 2 options
+        4a. after choosing: "Save it" as default for next time, or "Not now"
+        6. the chosen carton stays highlighted, the shopping list is updated
+      Voice is simulated with buttons. Works with mouse, Quest controllers (trigger),
+      hand pinch and gaze dwell (add ?input=gaze to the URL).
+
+      UNITS: 1 unit = 1 metre, Y up, the user starts at 0 0 0 looking towards -Z.
+      Product data (names, prices, protein) is written on each carton below: change it freely.
+      The bundled font only supports plain ASCII: write EUR, no umlauts.
+    -->
+    <a-scene
+      xr-buttons
+      background="color: #cfd8e3"
+      input-mode
+      cursor="rayOrigin: mouse"
+      raycaster="objects: .interactive"
+    >
+      <a-entity light="type: ambient; intensity: 1.0; color: #fff"></a-entity>
+      <a-entity light="type: directional; intensity: 0.7" position="1 3 2"></a-entity>
+
+      <!-- CAMERA RIG, same as in the course example (trigger = click, left thumbstick = walk). -->
+      <a-entity id="rig" position="0 0 4.5" wasd-controls thumbstick-move="hand: #left-hand">
+        <a-entity id="head" camera position="0 1.6 0" look-controls>
+          <!-- THE ASSISTANT: head-locked (child of #head), 1 m in front of the eyes and above
+               the centre of view. The whole #assistant moves with the head, so the button events still
+               bubble up to milk-assistant. The buttons stand in for the voice commands. -->
+          <a-entity
+            id="assistant"
+            position="0 0.28 -1"
+            milk-assistant="panel: #milk-panel; list: #shopping-list; cart: #cart; delay: 2500; compared: 6;
+                            rounds: milk-1 milk-2, milk-5 milk-3, milk-4 milk-6;
+                            tags: Best price/More protein, Cheaper/Organic, Lactose-free/Vegan;
+                            items: Milk, Eggs, Apples, Bread, Sugar, Cheese, Carrots, Yogurts"
+          >
+            <a-entity
+              id="milk-panel"
+              face-camera="yOnly: true"
+              hint-card="title: Milk; text: ...; accent: #2f8cff; width: 0.66; height: 0.56"
+            >
+              <a-entity id="btn-1" hint-button="label: Brand 1; event: pick-0; width: 0.19" position="-0.21 -0.22 0.01"></a-entity>
+              <a-entity id="btn-2" hint-button="label: Brand 2; event: pick-1; width: 0.19" position="0 -0.22 0.01"></a-entity>
+              <a-entity id="btn-3" hint-button="label: Neither; event: neither; width: 0.19" position="0.21 -0.22 0.01"></a-entity>
+            </a-entity>
+          </a-entity>
+
+          <!-- SHOPPING LIST: head-locked (child of #head), 1 m in front of the eyes, on the left
+               (step 1 of the storyboard). -->
+          <a-entity
+            id="shopping-list"
+            position="-0.75 0 -1"
+            face-camera="yOnly: true"
+            hint-card="title: Shopping list; text: ...; accent: #5fd38d; width: 0.42; height: 0.38"
+          ></a-entity>
+        </a-entity>
+        <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .interactive"></a-entity>
+        <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .interactive"></a-entity>
+      </a-entity>
+
+      <!-- SHOPPING TROLLEY: rolls along on the floor in front of the user (cart-follow).
+           The chosen milk is put in here when the user clicks it on the shelf. -->
+      <a-entity id="cart" shopping-cart cart-follow="distance: 0.85; deadZone: 35"></a-entity>
+
+      <!-- ROOM: hidden in passthrough AR (hide-on-enter-ar), the shelf stays. -->
+      <a-plane id="floor" hide-on-enter-ar rotation="-90 0 0" position="0 0 1.5" width="6" height="9" color="#8f9aa8"></a-plane>
+      <a-plane id="wall" hide-on-enter-ar position="0 1.5 -1.6" width="6" height="3" color="#e8e1d5"></a-plane>
+
+      <!-- SHELF: 1.3 m in front of the user. Boards at 0.4 / 0.9 / 1.4 m. The milks are on the middle board. -->
+      <a-entity id="shelf" position="0 0 -1.3">
+        <a-box position="0 0.75 -0.16" width="1.8" height="1.5" depth="0.02" color="#d9dde3"></a-box>
+        <a-box position="-0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0 0.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 0.9 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 1.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+
+        <!-- MILKS (middle board). Labels are in German like in a real Berlin supermarket;
+             the assistant shows the English name ("en") on its tag. -->
+        <a-entity id="milk-4" position="-0.65 0.91 0.02" hover-highlight
+          milk-carton="label: Laktosefrei; en: Lactose-free milk; price: 1.39; protein: 3.4; color: #b48ad6"></a-entity>
+        <a-entity id="milk-1" position="-0.39 0.91 0.02" hover-highlight
+          milk-carton="label: H-Milch; en: Long-life milk; price: 1.09; protein: 3.4; color: #4da3ff"></a-entity>
+        <a-entity id="milk-6" position="-0.13 0.91 0.02" hover-highlight
+          milk-carton="label: Haferdrink; en: Oat drink; price: 1.29; protein: 1.0; color: #c9a66b"></a-entity>
+        <a-entity id="milk-5" position="0.13 0.91 0.02" hover-highlight
+          milk-carton="label: Frische Milch; en: Fresh milk; price: 1.19; protein: 3.3; color: #f2b84b"></a-entity>
+        <a-entity id="milk-2" position="0.39 0.91 0.02" hover-highlight
+          milk-carton="label: Eiweiss Milch; en: Protein milk; price: 1.79; protein: 5.0; color: #e0574f"></a-entity>
+        <a-entity id="milk-3" position="0.65 0.91 0.02" hover-highlight
+          milk-carton="label: Bio Vollmilch; en: Organic whole milk; price: 1.49; protein: 3.3; color: #5fb374"></a-entity>
+
+        <!-- Filler products (not interactive), so it looks like a shelf. -->
+        <a-cylinder position="-0.6 0.45 0" radius="0.05" height="0.09" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="-0.45 0.45 0" radius="0.05" height="0.09" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="0.3 0.45 0" radius="0.05" height="0.09" color="#ffe1a8"></a-cylinder>
+        <a-cylinder position="0.45 0.45 0" radius="0.05" height="0.09" color="#ffe1a8"></a-cylinder>
+        <a-box position="-0.72 1.54 0" width="0.18" height="0.26" depth="0.06" color="#d9694f"></a-box>
+        <a-box position="0.72 1.54 0" width="0.18" height="0.26" depth="0.06" color="#6b8f3f"></a-box>
+      </a-entity>
+
+      <!-- AISLE SHELVES (decoration only, not interactive): the user now starts 2.5 m further back
+           and walks between these two shelves to reach the milk shelf. They are turned 90 degrees
+           so their fronts face the aisle. -->
+      <a-entity id="aisle-left" position="-1.3 0 0.8" rotation="0 90 0">
+        <a-box position="0 0.75 -0.16" width="1.8" height="1.5" depth="0.02" color="#d9dde3"></a-box>
+        <a-box position="-0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0 0.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 0.9 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 1.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="-0.6 0.52 0" width="0.14" height="0.22" depth="0.08" color="#e8c35a"></a-box>
+        <a-box position="-0.4 0.52 0" width="0.14" height="0.22" depth="0.08" color="#e8c35a"></a-box>
+        <a-box position="0.2 0.52 0" width="0.14" height="0.22" depth="0.08" color="#c0563f"></a-box>
+        <a-box position="0.4 0.52 0" width="0.14" height="0.22" depth="0.08" color="#c0563f"></a-box>
+        <a-cylinder position="-0.5 0.97 0" radius="0.04" height="0.14" color="#7aa35c"></a-cylinder>
+        <a-cylinder position="-0.35 0.97 0" radius="0.04" height="0.14" color="#7aa35c"></a-cylinder>
+        <a-cylinder position="0.3 0.97 0" radius="0.04" height="0.14" color="#d98c3a"></a-cylinder>
+        <a-cylinder position="0.45 0.97 0" radius="0.04" height="0.14" color="#d98c3a"></a-cylinder>
+        <a-box position="-0.3 1.5 0" width="0.2" height="0.18" depth="0.1" color="#6d8fb8"></a-box>
+        <a-box position="0.3 1.5 0" width="0.2" height="0.18" depth="0.1" color="#b86d8f"></a-box>
+      </a-entity>
+
+      <a-entity id="aisle-right" position="1.3 0 0.8" rotation="0 -90 0">
+        <a-box position="0 0.75 -0.16" width="1.8" height="1.5" depth="0.02" color="#d9dde3"></a-box>
+        <a-box position="-0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0 0.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 0.9 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 1.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-cylinder position="-0.5 0.47 0" radius="0.05" height="0.12" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="-0.35 0.47 0" radius="0.05" height="0.12" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="0.35 0.47 0" radius="0.05" height="0.12" color="#ffe1a8"></a-cylinder>
+        <a-box position="-0.4 1.0 0" width="0.12" height="0.18" depth="0.06" color="#5f8fd6"></a-box>
+        <a-box position="-0.2 1.0 0" width="0.12" height="0.18" depth="0.06" color="#5f8fd6"></a-box>
+        <a-box position="0.3 1.0 0" width="0.12" height="0.18" depth="0.06" color="#d6c25f"></a-box>
+        <a-box position="0.5 1.0 0" width="0.12" height="0.18" depth="0.06" color="#d6c25f"></a-box>
+        <a-box position="0 1.5 0" width="0.24" height="0.18" depth="0.1" color="#8fb86d"></a-box>
+      </a-entity>
+
+      <!-- Second pair of aisle shelves, directly behind the first pair (2 m further back). -->
+      <a-entity id="aisle-left-2" position="-1.3 0 2.8" rotation="0 90 0">
+        <a-box position="0 0.75 -0.16" width="1.8" height="1.5" depth="0.02" color="#d9dde3"></a-box>
+        <a-box position="-0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0 0.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 0.9 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 1.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-cylinder position="-0.55 0.49 0" radius="0.05" height="0.16" color="#9c4f8a"></a-cylinder>
+        <a-cylinder position="-0.4 0.49 0" radius="0.05" height="0.16" color="#9c4f8a"></a-cylinder>
+        <a-box position="0.35 0.51 0" width="0.16" height="0.2" depth="0.08" color="#e0a14f"></a-box>
+        <a-box position="-0.3 0.99 0" width="0.12" height="0.16" depth="0.06" color="#4fa3a0"></a-box>
+        <a-box position="-0.12 0.99 0" width="0.12" height="0.16" depth="0.06" color="#4fa3a0"></a-box>
+        <a-box position="0.45 0.99 0" width="0.12" height="0.16" depth="0.06" color="#d6705f"></a-box>
+        <a-box position="0 1.5 0" width="0.26" height="0.18" depth="0.1" color="#c9b46b"></a-box>
+      </a-entity>
+
+      <a-entity id="aisle-right-2" position="1.3 0 2.8" rotation="0 -90 0">
+        <a-box position="0 0.75 -0.16" width="1.8" height="1.5" depth="0.02" color="#d9dde3"></a-box>
+        <a-box position="-0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0.9 0.75 0" width="0.03" height="1.5" depth="0.34" color="#9aa3b0"></a-box>
+        <a-box position="0 0.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 0.9 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="0 1.4 0" width="1.8" height="0.02" depth="0.32" color="#9aa3b0"></a-box>
+        <a-box position="-0.5 0.52 0" width="0.18" height="0.22" depth="0.1" color="#6b8f3f"></a-box>
+        <a-box position="-0.25 0.52 0" width="0.18" height="0.22" depth="0.1" color="#6b8f3f"></a-box>
+        <a-cylinder position="0.4 0.47 0" radius="0.05" height="0.12" color="#f6f1e4"></a-cylinder>
+        <a-cylinder position="-0.4 0.97 0" radius="0.04" height="0.14" color="#b84f4f"></a-cylinder>
+        <a-cylinder position="0.2 0.97 0" radius="0.04" height="0.14" color="#5f6fd6"></a-cylinder>
+        <a-cylinder position="0.35 0.97 0" radius="0.04" height="0.14" color="#5f6fd6"></a-cylinder>
+        <a-box position="-0.3 1.5 0" width="0.2" height="0.18" depth="0.1" color="#d9694f"></a-box>
+        <a-box position="0.3 1.5 0" width="0.2" height="0.18" depth="0.1" color="#8fb86d"></a-box>
+      </a-entity>
+
+    </a-scene>
   </body>
 </html>
